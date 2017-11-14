@@ -17,7 +17,8 @@ public class KinectRenderDemo extends PApplet {
 	public static float PROJECTOR_RATIO = 1080f/1920.0f;
 	PImage img;
 	PImage bg;
-	
+	double minDist=0.07;
+	double minHand=0.2;
 	
 	Long id1;
 	Long id2;
@@ -34,6 +35,10 @@ public class KinectRenderDemo extends PApplet {
 	
 	PVector connector0;
 	PVector connector1;
+	
+	
+	Integer randPart1;
+	Integer randPart2;
 	
 	public void createWindow(boolean useP2D, boolean isFullscreen, float windowsScale) {
 		if (useP2D) {
@@ -169,23 +174,33 @@ public class KinectRenderDemo extends PApplet {
 			Bottom[4]=person.getJoint(Body.KNEE_LEFT);
 			Bottom[5]=person.getJoint(Body.KNEE_RIGHT);
 			
-			randomTester(Top, Mid, Bottom, person);
+			randomTester(Top, Mid, Bottom, person, false);
 			
-			if((gradient(Mid[6],Mid[8])*gradient(Mid[7], Mid[9])<0) && dist(Mid[8].x, Mid[8].y, Mid[9].x, Mid[9].y)<=0.06){
-				plotLine(Top, Mid, Bottom, person);
+			if(Mid[6]!=null && Mid[8]!=null && Mid[7]!=null && Mid[9]!=null){
+				
+				System.out.println(dist(Mid[8].x, Mid[8].y, Mid[9].x, Mid[9].y));
+				if((gradient(Mid[6],Mid[8])*gradient(Mid[7], Mid[9])<0) && dist(Mid[8].x, Mid[8].y, Mid[9].x, Mid[9].y)<=minDist){
+					randomTester(Top, Mid, Bottom, person, true);
+					
+				}
 			}
+
 			if(person.getId()==id1){
 				hand00=Mid[8];
 				hand01=Mid[9];
-				int randPart=new Random().nextInt(3);
 				
-				if(randPart==0){
+				if(randPart1==null){
+					randPart1=new Random().nextInt(3);
+				}
+				
+				
+				if(randPart1==0){
 					connector0=Top[randIdx[0][0]];
 				}
-				else if(randPart==1){
+				else if(randPart1==1){
 					connector0=Mid[randIdx[0][1]];
 				}
-				else if(randPart==2){
+				else if(randPart1==2){
 					connector0=Bottom[randIdx[0][2]];
 				}
 			}
@@ -193,27 +208,33 @@ public class KinectRenderDemo extends PApplet {
 				hand10=Mid[8];
 				hand11=Mid[9];
 				
-				int randPart=new Random().nextInt(3);
+				if(randPart2==null){
+					randPart2=new Random().nextInt(3);
+				}
 				
-				if(randPart==0){
-					connector0=Top[randIdx[1][0]];
+				if(randPart2==0){
+					connector1=Top[randIdx[1][0]];
 				}
-				else if(randPart==1){
-					connector0=Mid[randIdx[1][1]];
+				else if(randPart2==1){
+					connector1=Mid[randIdx[1][1]];
 				}
-				else if(randPart==2){
-					connector0=Bottom[randIdx[1][2]];
+				else if(randPart2==2){
+					connector1=Bottom[randIdx[1][2]];
 				}
 			}
 			
 			if(hand00!=null && hand11!=null){
-				if(dist(hand00.x, hand00.y, hand11.x, hand11.y)<=0.06){
+				System.out.println("hand0011"+dist(hand00.x, hand00.y, hand11.x, hand11.y));
+				if(dist(hand00.x, hand00.y, hand11.x, hand11.y)<=minHand){
 					simpleLinePlot(connector0,connector1);
+					plotLine(Top, Mid, Bottom, person);
 				}
 			}
 			if(hand01!=null && hand10!=null){
-				if(dist(hand01.x, hand01.y, hand10.x, hand10.y)<=0.06){
+				System.out.println("hand0110"+dist(hand01.x, hand01.y, hand10.x, hand10.y));
+				if(dist(hand01.x, hand01.y, hand10.x, hand10.y)<=minHand){
 					simpleLinePlot(connector0, connector1);
+					plotLine(Top, Mid, Bottom, person);
 				}
 			}
 			
@@ -222,7 +243,7 @@ public class KinectRenderDemo extends PApplet {
 		}
 
 	}
-	public void randomTester(PVector[] Top, PVector[] Mid, PVector[] Bot, Body person){
+	public void randomTester(PVector[] Top, PVector[] Mid, PVector[] Bot, Body person, boolean randAgain){
 		int idIdx=0;
 		if(person.getId()==id1){
 			idIdx=0;
@@ -231,54 +252,104 @@ public class KinectRenderDemo extends PApplet {
 			idIdx=1;
 		}
 		
-		
-		if(randIdx[idIdx][0]!=null && Top[randIdx[idIdx][0]]!=null){
-			plotImage(Top[randIdx[idIdx][0]]);
+		if(randAgain==true){
+			if(randIdx[idIdx][0]!=null && Top[randIdx[idIdx][0]]!=null){
+				int randVal=new Random().nextInt(Top.length);
+				long start=System.currentTimeMillis();
+				while(Top[randVal]==null){
+					randVal=new Random().nextInt(Top.length);
+					
+					if(System.currentTimeMillis()-start>delay){
+						break;
+					}
+				}
+				randIdx[idIdx][0]=randVal;
+			}
+
+			
+			
+			if(randIdx[idIdx][1]!=null && Mid[randIdx[idIdx][1]]!=null){
+				int randVal=new Random().nextInt(Mid.length);
+				long start=System.currentTimeMillis();
+				while(Mid[randVal]==null){
+					randVal=new Random().nextInt(Mid.length);
+					
+					if(System.currentTimeMillis()-start>delay){
+						break;
+					}
+				}
+				randIdx[idIdx][1]=randVal;
+			}
+
+			
+			
+			if(randIdx[idIdx][2]!=null && Bot[randIdx[idIdx][2]]!=null){
+				int randVal=new Random().nextInt(Bot.length);
+				long start=System.currentTimeMillis();
+				while(Bot[randVal]==null){
+					randVal=new Random().nextInt(Bot.length);
+					
+					if(System.currentTimeMillis()-start>delay){
+						break;
+					}
+				}
+				randIdx[idIdx][2]=randVal;
+			
+			}
 		}
 		else{
-			int randVal=new Random().nextInt(Top.length);
-			long start=System.currentTimeMillis();
-			while(Top[randVal]==null){
-				randVal=new Random().nextInt(Top.length);
-				
-				if(System.currentTimeMillis()-start>delay){
-					break;
-				}
+			if(randIdx[idIdx][0]!=null && Top[randIdx[idIdx][0]]!=null){
+				plotImage(Top[randIdx[idIdx][0]]);
 			}
-			randIdx[idIdx][0]=randVal;
-		}
-		
-		if(randIdx[idIdx][1]!=null && Mid[randIdx[idIdx][1]]!=null){
-			plotImage(Mid[randIdx[idIdx][1]]);
-		}
-		else{
-			int randVal=new Random().nextInt(Mid.length);
-			long start=System.currentTimeMillis();
-			while(Mid[randVal]==null){
-				randVal=new Random().nextInt(Mid.length);
-				
-				if(System.currentTimeMillis()-start>delay){
-					break;
+			else{
+				int randVal=new Random().nextInt(Top.length);
+				long start=System.currentTimeMillis();
+				while(Top[randVal]==null){
+					randVal=new Random().nextInt(Top.length);
+					
+					if(System.currentTimeMillis()-start>delay){
+						break;
+					}
 				}
+				randIdx[idIdx][0]=randVal;
 			}
-			randIdx[idIdx][1]=randVal;
-		}
-		
-		if(randIdx[idIdx][2]!=null && Bot[randIdx[idIdx][2]]!=null){
-			plotImage(Bot[randIdx[idIdx][2]]);
-		}
-		else{
-			int randVal=new Random().nextInt(Bot.length);
-			long start=System.currentTimeMillis();
-			while(Bot[randVal]==null){
-				randVal=new Random().nextInt(Bot.length);
-				
-				if(System.currentTimeMillis()-start>delay){
-					break;
+			
+			if(randIdx[idIdx][1]!=null && Mid[randIdx[idIdx][1]]!=null){
+				plotImage(Mid[randIdx[idIdx][1]]);
+			}
+			else{
+				int randVal=new Random().nextInt(Mid.length);
+				long start=System.currentTimeMillis();
+				while(Mid[randVal]==null){
+					randVal=new Random().nextInt(Mid.length);
+					
+					if(System.currentTimeMillis()-start>delay){
+						break;
+					}
 				}
+				randIdx[idIdx][1]=randVal;
 			}
-			randIdx[idIdx][2]=randVal;
+			
+			if(randIdx[idIdx][2]!=null && Bot[randIdx[idIdx][2]]!=null){
+				plotImage(Bot[randIdx[idIdx][2]]);
+			}
+			else{
+				int randVal=new Random().nextInt(Bot.length);
+				long start=System.currentTimeMillis();
+				while(Bot[randVal]==null){
+					randVal=new Random().nextInt(Bot.length);
+					
+					if(System.currentTimeMillis()-start>delay){
+						break;
+					}
+				}
+				randIdx[idIdx][2]=randVal;
+			}
+			
+			
 		}
+
+
 	}
 		
 
