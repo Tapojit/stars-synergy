@@ -1,18 +1,20 @@
 package edu.mtholyoke.cs.comsc243.kinectUDP;
 
+import java.io.IOException;
+
 import processing.data.JSONArray;
 
 public class KinectBodyData {
 	JSONArray jarray;
-	
 
-	public int getPersonCount() {
-		try {
-			return jarray.size();			
-		} catch (NullPointerException npe) {
-			System.out.println("*** Warning malformed jarray***");
+	public int getPersonCount(){
+		try{
+			return jarray.size();
+		}catch (NullPointerException e){
+			System.out.println("jfklajlja");
 			return 0;
 		}
+		
 	}
 
 	/**
@@ -28,11 +30,8 @@ public class KinectBodyData {
 			return null;
 		}
 	}
-	
 
-	String tmpJsonStr;
 	public KinectBodyData(String jsonStr) {
-		this.tmpJsonStr = jsonStr;
 		jarray = JSONArray.parse(jsonStr);
 	}
 

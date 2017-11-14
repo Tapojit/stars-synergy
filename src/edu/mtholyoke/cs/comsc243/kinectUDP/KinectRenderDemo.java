@@ -30,6 +30,10 @@ public class KinectRenderDemo extends PApplet {
 	PVector hand01;
 	PVector hand10;
 	PVector hand11;
+	int delay=1000;
+	
+	PVector connector0;
+	PVector connector1;
 	
 	public void createWindow(boolean useP2D, boolean isFullscreen, float windowsScale) {
 		if (useP2D) {
@@ -62,12 +66,12 @@ public class KinectRenderDemo extends PApplet {
 
 	public void setup(){
 
-		try {
-			kinectReader = new KinectBodyDataProvider("test3.kinect", 5);
-		} catch (IOException e) {
-			System.out.println("Unable to creat e kinect producer");
-		}
-//		kinectReader = new KinectBodyDataProvider(8008);
+//		try {
+//			kinectReader = new KinectBodyDataProvider("test3.kinect", 5);
+//		} catch (IOException e) {
+//			System.out.println("Unable to creat e kinect producer");
+//		}
+		kinectReader = new KinectBodyDataProvider(8008);
 		kinectReader.start();
 	}
 	public void draw(){
@@ -167,70 +171,53 @@ public class KinectRenderDemo extends PApplet {
 			
 			randomTester(Top, Mid, Bottom, person);
 			
-			if(gradient(Mid[6],Mid[8])*gradient(Mid[7], Mid[9])<0){
+			if((gradient(Mid[6],Mid[8])*gradient(Mid[7], Mid[9])<0) && dist(Mid[8].x, Mid[8].y, Mid[9].x, Mid[9].y)<=0.06){
 				plotLine(Top, Mid, Bottom, person);
 			}
 			if(person.getId()==id1){
 				hand00=Mid[8];
 				hand01=Mid[9];
+				int randPart=new Random().nextInt(3);
+				
+				if(randPart==0){
+					connector0=Top[randIdx[0][0]];
+				}
+				else if(randPart==1){
+					connector0=Mid[randIdx[0][1]];
+				}
+				else if(randPart==2){
+					connector0=Bottom[randIdx[0][2]];
+				}
 			}
 			else if(person.getId()==id2){
 				hand10=Mid[8];
 				hand11=Mid[9];
+				
+				int randPart=new Random().nextInt(3);
+				
+				if(randPart==0){
+					connector0=Top[randIdx[1][0]];
+				}
+				else if(randPart==1){
+					connector0=Mid[randIdx[1][1]];
+				}
+				else if(randPart==2){
+					connector0=Bottom[randIdx[1][2]];
+				}
 			}
 			
 			if(hand00!=null && hand11!=null){
 				if(dist(hand00.x, hand00.y, hand11.x, hand11.y)<=0.06){
-					simpleLinePlot(hand00,hand11);
+					simpleLinePlot(connector0,connector1);
 				}
 			}
 			if(hand01!=null && hand10!=null){
 				if(dist(hand01.x, hand01.y, hand10.x, hand10.y)<=0.06){
-					simpleLinePlot(hand01,hand10);
+					simpleLinePlot(connector0, connector1);
 				}
 			}
 			
-//			if(person.getId()==id1){
-//				if(randTop==null){
-//					randTop=new Random().nextInt(Top.length);
-//				}
-//				if(randMid==null){
-//					randMid=new Random().nextInt(Mid.length);
-//				}
-//				if(randBot==null){
-//					randBot=new Random().nextInt(Bottom.length);
-//				}
-//				
-//				
-//				plotImage(Top[randTop]);
-//				plotImage(Mid[randMid]);
-//				plotImage(Bottom[randBot]);
-//				
-//				PVector[] finalP={Top[randTop], Mid[randMid], Bottom[randBot]};
-//				
-//				
-//				
-//			}
-//			else if(person.getId()==id2){
-//				if(randTop2==null){
-//					randTop2=new Random().nextInt(Top.length);
-//				}
-//				if(randMid2==null){
-//					randMid2=new Random().nextInt(Mid.length);
-//				}
-//				if(randBot2==null){
-//					randBot2=new Random().nextInt(Bottom.length);
-//				}
-//				
-//				
-//				plotImage(Top[randTop2]);
-//				plotImage(Mid[randMid2]);
-//				plotImage(Bottom[randBot2]);
-//				
-//				
-//				PVector[] finalP={Top[randTop2], Mid[randMid2], Bottom[randBot2]};
-//			}
-//			
+
 			
 		}
 
@@ -254,7 +241,7 @@ public class KinectRenderDemo extends PApplet {
 			while(Top[randVal]==null){
 				randVal=new Random().nextInt(Top.length);
 				
-				if(System.currentTimeMillis()-start>1000){
+				if(System.currentTimeMillis()-start>delay){
 					break;
 				}
 			}
@@ -270,7 +257,7 @@ public class KinectRenderDemo extends PApplet {
 			while(Mid[randVal]==null){
 				randVal=new Random().nextInt(Mid.length);
 				
-				if(System.currentTimeMillis()-start>1000){
+				if(System.currentTimeMillis()-start>delay){
 					break;
 				}
 			}
@@ -286,7 +273,7 @@ public class KinectRenderDemo extends PApplet {
 			while(Bot[randVal]==null){
 				randVal=new Random().nextInt(Bot.length);
 				
-				if(System.currentTimeMillis()-start>1000){
+				if(System.currentTimeMillis()-start>delay){
 					break;
 				}
 			}
